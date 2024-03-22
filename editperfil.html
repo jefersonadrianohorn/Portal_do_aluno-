@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Perfil</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> <!-- Ícones Font Awesome -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11"> <!-- SweetAlert2 CSS -->
+    <style>
+        /* Estilos adicionais */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .logo img {
+            width: 100px; /* Ajuste conforme necessário */
+            height: auto;
+            margin-bottom: 10px;
+        }
+
+        .main-content {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box; /* Para incluir o padding na largura total */
+        }
+
+        select {
+            appearance: none; /* Remover estilo padrão do sistema */
+            -webkit-appearance: none; /* Para navegadores baseados em WebKit */
+            -moz-appearance: none; /* Para navegadores baseados em Gecko */
+            background-image: url('data:image/svg+xml;utf8,<svg fill="%23333" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5H7z"/></svg>'); /* Ícone da seta para baixo */
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 16px;
+            padding-right: 30px; /* Para acomodar o ícone */
+        }
+
+        button[type="submit"] {
+            position: relative; /* Para posicionar o loader */
+            background-color: #333;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #555;
+        }
+
+        /* Estilo específico para o campo "codigo" */
+        #codigo {
+            background-color: #f2f2f2; /* Cor de fundo cinza */
+            cursor: not-allowed; /* Cursor inativo */
+        }
+
+        /* Estilo do loader */
+        .loader {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: none; /* Inicialmente oculto */
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Exibir loader quando o botão está em estado "carregando" */
+        .loading button[type="submit"] {
+            pointer-events: none; /* Desativar cliques enquanto estiver carregando */
+            opacity: 0.7; /* Reduzir a opacidade para indicar desativação */
+        }
+
+        .loading .loader {
+            display: block; /* Exibir o loader */
+        }
+
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="logo">
+            <img src="logo.png" alt="Logo do Portal">
+            <h1 id="pageTitle">Editar Perfil</h1>
+        </div>
+    </header>
+    <main class="main-content">
+        <form id="editProfileForm">
+            <div class="form-group">
+                <label for="codigo">Código do Aluno:</label>
+                <input type="text" id="codigo" name="codigo" readonly>
+            </div>
+            <div class="form-group">
+                <label for="nome">Nome:</label>
+                <input type="text" id="nome" name="nome">
+            </div>
+            <div class="form-group">
+                <label for="serie">Série:</label>
+                <select id="serie" name="serie">
+                    <option value="6EF">6º Ano EF</option>
+                    <option value="7EF">7º Ano EF</option>
+                    <option value="8EF">8º Ano EF</option>
+                    <option value="9EF">9º Ano EF</option>
+                    <option value="1EM">1º Ano EM</option>
+                    <option value="2EM">2º Ano EM</option>
+                    <option value="3EM">3º Ano EM</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email">
+            </div>
+            <div class="form-group">
+                <label for="turno">Turno:</label>
+                <select id="turno" name="turno">
+                    <option value="Matutino">Matutino</option>
+                    <option value="Vespertino">Vespertino</option>
+                </select>
+            </div>
+            <div class="loader"></div> <!-- Loader -->
+            <button type="submit">Salvar Alterações</button>
+        </form>
+    </main>
+
+    <!-- SweetAlert2 JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Obter parâmetros da URL
+            var params = new URLSearchParams(window.location.search);
+            var codigo = params.get('codigo');
+            var nome = params.get('nome');
+            var serie = params.get('serie');
+            var email = params.get('email');
+            var turno = params.get('turno');
+
+            // Preencher os campos do formulário com os valores obtidos
+            document.getElementById('codigo').value = codigo;
+            document.getElementById('nome').value = nome;
+            document.getElementById('email').value = email;
+
+            // Preencher o campo de seleção de turno com base no valor obtido
+            if (turno === 'Matutino' || turno === 'Vespertino') {
+                document.getElementById('turno').value = turno;
+            }
+
+            // Preencher o campo de seleção de série com base no valor obtido
+            if (serie) {
+                document.getElementById('serie').value = serie;
+            }
+
+            // Adicionar evento de envio ao formulário
+            document.getElementById('editProfileForm').addEventListener('submit', function (event) {
+                event.preventDefault(); // Prevenir o envio padrão do formulário
+
+                // Construir o objeto de dados do formulário
+                var formData = new FormData();
+                formData.append('codigo', codigo);
+                formData.append('nome', document.getElementById('nome').value);
+                formData.append('serie', document.getElementById('serie').value);
+                formData.append('email', document.getElementById('email').value);
+                formData.append('turno', document.getElementById('turno').value);
+
+                // Enviar os dados via método POST
+                fetch('https://script.google.com/macros/s/AKfycbyr6rGGk9zmLOR-G-HfveocTg4UiFZsxWeZpL32e9u681AW3mFprshHEY5e8wW1ODWrNQ/exec', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            return response.text(); // Retorna a resposta como texto
+                        } else {
+                            throw new Error('Erro ao atualizar dados.');
+                        }
+                    })
+                    .then(data => {
+                        console.log('Resposta do POST:', data); // Exibir resposta no console
+
+                        // Exibir pop-up de confirmação
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Perfil atualizado com sucesso!',
+                            text: 'Encerrado sessao  para atualizar o ultimos dados faça login novamente', // Exibe a resposta do servidor
+                            timer: 5000, // Fecha o pop-up após 3 segundos
+                            timerProgressBar: true,
+                            allowOutsideClick: false,
+                            showConfirmButton: false
+                        }).then(() => {
+                            // Redirecionar para a página principal após 3 segundos
+                            var url = 'Login.html?codigo=' + codigo + '&nome=' + encodeURIComponent(document.getElementById('nome').value) + '&serie=' + serie + '&email=' + encodeURIComponent(document.getElementById('email').value) + '&turno=' + encodeURIComponent(document.getElementById('turno').value);
+                            window.location.href = url;
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Erro:', error); // Exibir erro no console
+
+                        // Exibir pop-up de erro
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erro ao atualizar perfil',
+                            text: 'Por favor, tente novamente mais tarde.'
+                        });
+                    });
+            });
+        });
+
+    </script>
+
+</body>
+
+</html>
+

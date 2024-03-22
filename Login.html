@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f0f0f0;
+    }
+    .container {
+      width: 300px;
+      background-color: #fff;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    form {
+      text-align: center;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    input[type="text"],
+    input[type="password"],
+    input[type="submit"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      outline: none;
+    }
+    input[type="submit"] {
+      background-color: #007bff;
+      color: #fff;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    input[type="submit"]:hover {
+      background-color: #0056b3;
+    }
+    #resultado {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .erro {
+      color: red;
+      font-weight: bold;
+    }
+    p {
+      text-align: center;
+      margin-top: 10px;
+    }
+    .esqueceu-senha {
+      text-align: center;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+    .esqueceu-senha a {
+      color: #007bff;
+      text-decoration: none;
+    }
+    .show-password-checkbox {
+      margin-left: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Login</h1>
+    <form id="consultaForm">
+      <label for="codAluno">Código do Aluno:</label>
+      <input type="text" id="codAluno" name="codAluno">
+      <label for="senha">Senha:</label>
+      <div style="position: relative;">
+        <input type="password" id="senha" name="senha">
+        <input type="checkbox" class="show-password-checkbox" onchange="togglePasswordVisibility()"> Mostrar senha
+      </div>
+      <input type="submit" value="Entrar">
+    </form>
+    <p class="esqueceu-senha"><a href="esqueceu_senha.html">Esqueceu sua senha?</a></p>
+    <div id="resultado"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    document.getElementById('consultaForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      var codAluno = document.getElementById('codAluno').value;
+      var senha = document.getElementById('senha').value;
+      consultarAluno(codAluno, senha);
+    });
+
+    function consultarAluno(codAluno, senha) {
+      // Adicionando "@edu.mt.gov.br" ao código do aluno
+      var email = codAluno + "@edu.mt.gov.br";
+
+      fetch('https://script.google.com/macros/s/AKfycbz2h6mX8s4Wcq-z8krYeROzQqMa-dF2HJuVX9RsAOPVmbDPmxU17iXtf2MlTSf4gcLm/exec', {
+        method: 'POST',
+        body: new URLSearchParams({ codAluno: codAluno, senha: senha, email: email }),
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      })
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error('Erro de comunicação com os servidores. Verifique sua conexão ou tente novamente mais tarde.');
+        }
+      })
+      .then(data => {
+        if (data.acesso) {
+          var url = `Home.html?codigo=${data.dados.codigo}&nome=${data.dados.nome}&serie=${data.dados.serie}&turno=${data.dados.turno}&email=${data.dados.email}`;
+          window.location.href = url;
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Opss!',
+            text: data.mensagem
+          });
+        }
+      })
+      .catch(error => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Opss!',
+          text: 'Erro ao fazer a solicitação. Verifique sua conexão com a internet e tente novamente.'
+        });
+      });
+    }
+
+    function togglePasswordVisibility() {
+      var senhaInput = document.getElementById('senha');
+      if (senhaInput.type === "password") {
+        senhaInput.type = "text";
+      } else {
+        senhaInput.type = "password";
+      }
+    }
+  </script>
+</body>
+</html>

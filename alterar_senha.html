@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alterar Senha do Aluno</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+   body, h2, form, label, input, #mensagem {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    form {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      width: 300px;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #555;
+    }
+    input[type="text"], input[type="password"] {
+      width: calc(100% - 40px);
+      padding: 8px;
+      margin-bottom: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .password-container {
+      position: relative;
+    }
+    .password-container i {
+      position: absolute;
+      top: 50%;
+      right: 5px;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #888;
+    }
+    input[type="submit"] {
+      width: 100%;
+      padding: 10px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    input[type="submit"]:hover {
+      background-color: #0056b3;
+    }
+    #strengthMessage {
+      margin-top: 8px;
+      color: red;
+      font-size: 14px;
+      text-align: center;
+    }  </style>
+</head>
+<body>
+  <form id="alterarSenhaForm" method="post">
+    <h2>Alterar Senha do Aluno</h2>
+    <HR></HR>
+    <label for="codigo">Código do Aluno:</label>
+    <input type="text" id="codigo" name="codigo" required>
+    <label for="senhaAtual">Senha Atual:</label>
+    <div class="password-container">
+      <input type="password" id="senhaAtual" name="senhaAtual" required>
+      <i class="far fa-eye" onclick="togglePasswordVisibility('senhaAtual')"></i>
+    </div>
+    <label for="novaSenha">Nova Senha:</label>
+    <div class="password-container">
+      <input type="password" id="novaSenha" name="novaSenha" required>
+      <i class="far fa-eye" onclick="togglePasswordVisibility('novaSenha')"></i>
+    </div>
+    <div id="strengthMessage"></div>
+    <input type="submit" value="Alterar Senha">
+    <HR></HR>
+    <div id="mensagem"></div>
+  </form>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+  <script>
+    // Função para alternar visibilidade da senha
+    function togglePasswordVisibility(inputId) {
+      var passwordInput = document.getElementById(inputId);
+      var toggleIcon = passwordInput.nextElementSibling;
+      
+      if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+        toggleIcon.classList.remove("fa-eye");
+        toggleIcon.classList.add("fa-eye-slash");
+      } else {
+        passwordInput.type = "password";
+        toggleIcon.classList.remove("fa-eye-slash");
+        toggleIcon.classList.add("fa-eye");
+      }
+    }
+
+    // Função para extrair parâmetros da URL
+    function getParameterByName(name, url) {
+      if (!url) url = window.location.href;
+      name = name.replace(/[\[\]]/g, "\\$&");
+      var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+          results = regex.exec(url);
+      if (!results) return null;
+      if (!results[2]) return '';
+      return decodeURIComponent(results[2].replace(/\+/g, " "));
+    }
+
+    // Preencher campos com base nos parâmetros da URL
+    window.onload = function() {
+      var codigoParam = getParameterByName('codigo');
+      var senhaAtualParam = getParameterByName('senhaAtual');
+
+      if (codigoParam) {
+        document.getElementById('codigo').value = codigoParam;
+      }
+
+      if (senhaAtualParam) {
+        document.getElementById('senhaAtual').value = senhaAtualParam;
+      }
+    };
+
+    // Event listener para validação da senha
+    document.getElementById("novaSenha").addEventListener("input", function() {
+      var password = this.value;
+      var strengthMessage = document.getElementById("strengthMessage");
+      var hasNumber = /\d/.test(password);
+      var hasUpperCase = /[A-Z]/.test(password);
+      
+      if (password.length === 0) {
+        strengthMessage.innerHTML = "";
+      } else if (password.length >= 8 && hasNumber && hasUpperCase) {
+        strengthMessage.style.color = "green";
+        strengthMessage.innerHTML = "Senha forte, inhackeável 😎";
+      } else if (password.length >= 8 && (!hasNumber || !hasUpperCase)) {
+        strengthMessage.style.color = "orange";
+        strengthMessage.innerHTML = "Senha média, está bom mas dá para melhorar 🙂";
+      } else {
+        strengthMessage.style.color = "red";
+        strengthMessage.innerHTML = "Senha fraca, eu sei que você consegue mais 🥺";
+      }
+    });
+
+    // Event listener para envio do formulário
+    document.getElementById("alterarSenhaForm").addEventListener("submit", function(event) {
+      event.preventDefault();
+      var formData = new FormData(this);
+      var xhr = new XMLHttpRequest();
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+          document.getElementById("mensagem").innerHTML = xhr.responseText;
+        }
+      };
+      xhr.open("POST", "https://script.google.com/macros/s/AKfycbx24ghX8_TNi4U2OIGMWiQg15G9JoKyaRXwxmds2zlBJVofwnLAejIWI_veLb1r0F65Zg/exec");
+      xhr.send(formData);
+    });
+  </script>
+</body>
+</html>

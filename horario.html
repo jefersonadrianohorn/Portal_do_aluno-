@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horário Escolar</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #f8f9fa;
+        }
+        .btn-container {
+            margin-bottom: 20px;
+        }
+        .hidden {
+            display: none;
+        }
+        .footer-text {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .header-info {
+            font-size: 16px;
+            font-weight: bold;
+            text-align: right;
+            margin-right: 20px;
+        }
+        .header-logo {
+            max-width: 100px;
+            margin-right: 20px;
+        }
+        .header-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <img src="logo.png" alt="Logo" class="header-logo">
+            <h1 class="header-title">Horário Escolar</h1>
+        </div>
+        <div class="header-info">
+            <div>Turma: 9ºA</div>
+            <div>Turno: Matutino</div>
+            <div>Data de Emissão: <span id="time"></span></div>
+        </div>
+    </div>
+    <div class="btn-container">
+        <button class="btn btn-primary" onclick="generatePDF()">Gerar PDF</button>
+        <button class="btn btn-success" onclick="generatePNG()">Gerar PNG</button>
+    </div>
+    <table>
+        <tr>
+            <th>Aulas</th>
+            <th>Segunda-feira</th>
+            <th>Terça-feira</th>
+            <th>Quarta-feira</th>
+            <th>Quinta-feira</th>
+            <th>Sexta-feira</th>
+        </tr>
+        <!-- Linhas da tabela -->
+    </table>
+    <div class="footer-text">
+        Este horário foi gerado pelo sistema do Portal do Estudante Militar VR em <span id=""></span>.
+    </div>
+
+    <!-- Incluindo scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
+    <script>
+        function generatePDF() {
+            const btnContainer = document.querySelector('.btn-container');
+            btnContainer.classList.add('hidden');
+
+            const element = document.body;
+            html2pdf().from(element).save('horario_escolar.pdf');
+
+            // Remover a classe 'hidden' após a geração do PDF
+            setTimeout(function() {
+                btnContainer.classList.remove('hidden');
+            }, 1000); // Aguarda 1 segundo para garantir que o PDF seja gerado antes de exibir os botões novamente
+        }
+
+        function generatePNG() {
+            const btnContainer = document.querySelector('.btn-container');
+            btnContainer.classList.add('hidden');
+
+            const element = document.body;
+            domtoimage.toPng(element)
+                .then(function (dataUrl) {
+                    const link = document.createElement('a');
+                    link.download = 'horario_escolar.png';
+                    link.href = dataUrl;
+                    link.click();
+
+                    // Remover a classe 'hidden' após a geração do PNG
+                    setTimeout(function() {
+                        btnContainer.classList.remove('hidden');
+                    }, 1000); // Aguarda 1 segundo para garantir que o PNG seja gerado antes de exibir os botões novamente
+                });
+        }
+
+        // Adiciona a hora atual ao elemento 'time'
+        document.getElementById('time').textContent = new Date().toLocaleString();
+    </script>
+</body>
+</html>
